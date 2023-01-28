@@ -14,3 +14,9 @@ resource "azurerm_storage_account" "gwa_statefile" {
     environment = "exampletag"
   }
 }
+
+resource "azurerm_storage_container" "gwa_terraform" {
+  name                  = "terraform"
+  storage_account_name  = azurerm_storage_account.gwa_statefile.name
+  container_access_type = "private"
+}
