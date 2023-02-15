@@ -15,3 +15,15 @@ variable "location" {
   type        = string
   default     = "Canada Central"
 }
+
+variable "exampletag" {
+  description = "Example use of a tag"
+  type        = string
+  default     = "exampletag"
+}
+
+variable "env_name" {
+  description = "Working environment"
+  type        = string
+  default     = "dev"
+}
