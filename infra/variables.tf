@@ -27,3 +27,9 @@ variable "env_name" {
   type        = string
   default     = "dev"
 }
+
+variable "website_hostname" {
+  description = "Default website hostname"
+  type        = string
+  default     = "gwa-mccrackenyyc.nexxai.dev"
+}
