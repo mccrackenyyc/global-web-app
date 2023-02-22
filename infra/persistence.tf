@@ -22,14 +22,16 @@ resource "azurerm_storage_account" "gwa_sql_logs" {
 }
 
 resource "azurerm_mssql_server" "gwa_sql_server" {
-  for_each                     = local.regions
-  name                         = "gwa-sql-server-${each.key}-${var.env_name}"
-  resource_group_name          = azurerm_resource_group.gwa_sql_rg[each.key].name
-  location                     = azurerm_resource_group.gwa_sql_rg[each.key].location
-  version                      = "12.0"
-  administrator_login          = "missadministrator"
-  administrator_login_password = "thisIsKat11"
-  #creds left in plain text temporarily, to be updated on production deploy
+  for_each            = local.regions
+  name                = "gwa-sql-server-${each.key}-${var.env_name}"
+  resource_group_name = azurerm_resource_group.gwa_sql_rg[each.key].name
+  location            = azurerm_resource_group.gwa_sql_rg[each.key].location
+  version             = "12.0"
+  azuread_administrator {
+    azuread_authentication_only = true
+    login_username              = var.admin_upn
+    object_id                   = data.azuread_user.admin.object_id
+  }
   minimum_tls_version = "1.2"
 
   tags = {
