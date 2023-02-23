@@ -12,6 +12,7 @@ resource "azurerm_storage_account" "gwa_sql_logs" {
   #checkov:skip=CKV_AZURE_43:False positive, storage account name is fine
   #checkov:skip=CKV2_AZURE_1:Azure managed key confirmed acceptable
   #checkov:skip=CKV2_AZURE_18:Azure managed key confirmed acceptable
+  #checkov:skip=CKV_AZURE_190:Not supported in latest provider, set public_network_access_enabled argument instead
   for_each                      = local.regions
   name                          = "gwasqllogs${each.key}${var.env_name}"
   resource_group_name           = azurerm_resource_group.gwa_sql_rg[each.key].name
