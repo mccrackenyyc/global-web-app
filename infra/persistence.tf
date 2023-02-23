@@ -9,12 +9,27 @@ resource "azurerm_resource_group" "gwa_sql_rg" {
 }
 
 resource "azurerm_storage_account" "gwa_sql_logs" {
-  for_each                 = local.regions
-  name                     = "gwasqllogs${each.key}${var.env_name}"
-  resource_group_name      = azurerm_resource_group.gwa_sql_rg[each.key].name
-  location                 = azurerm_resource_group.gwa_sql_rg[each.key].location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
+  #checkov:skip=CKV_AZURE_43:False positive, storage account name is fine
+  #checkov:skip=CKV2_AZURE_1:Azure managed key confirmed acceptable
+  #checkov:skip=CKV2_AZURE_18:Azure managed key confirmed acceptable
+  for_each                        = local.regions
+  name                            = "gwasqllogs${each.key}${var.env_name}"
+  resource_group_name             = azurerm_resource_group.gwa_sql_rg[each.key].name
+  location                        = azurerm_resource_group.gwa_sql_rg[each.key].location
+  account_tier                    = "Standard"
+  account_replication_type        = "ZRS"
+  min_tls_version                 = "TLS1_2"
+  allow_nested_items_to_be_public = false
+
+  queue_properties {
+    logging {
+      delete                = true
+      read                  = true
+      write                 = true
+      version               = "1.0"
+      retention_policy_days = 100
+    }
+  }
 
   tags = {
     tag = var.exampletag
@@ -22,11 +37,12 @@ resource "azurerm_storage_account" "gwa_sql_logs" {
 }
 
 resource "azurerm_mssql_server" "gwa_sql_server" {
-  for_each            = local.regions
-  name                = "gwa-sql-server-${each.key}-${var.env_name}"
-  resource_group_name = azurerm_resource_group.gwa_sql_rg[each.key].name
-  location            = azurerm_resource_group.gwa_sql_rg[each.key].location
-  version             = "12.0"
+  for_each                      = local.regions
+  name                          = "gwa-sql-server-${each.key}-${var.env_name}"
+  resource_group_name           = azurerm_resource_group.gwa_sql_rg[each.key].name
+  location                      = azurerm_resource_group.gwa_sql_rg[each.key].location
+  version                       = "12.0"
+  public_network_access_enabled = false
   azuread_administrator {
     azuread_authentication_only = true
     login_username              = var.admin_upn

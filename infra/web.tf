@@ -14,7 +14,8 @@ resource "azurerm_service_plan" "gwa_service_plan" {
   resource_group_name = azurerm_resource_group.gwa_web_rg[each.key].name
   location            = azurerm_resource_group.gwa_web_rg[each.key].location
   os_type             = "Linux"
-  sku_name            = "P1v2"
+  sku_name            = "EP1"
+  worker_count        = 2
 
   tags = {
     tag = var.exampletag
@@ -22,13 +23,37 @@ resource "azurerm_service_plan" "gwa_service_plan" {
 }
 
 resource "azurerm_linux_web_app" "gwa_linux_web_app" {
+  #checkov:skip=CKV_AZURE_88:Website built using non-Azure storage
+  #checkov:skip=CKV_AZURE_17:Client-side cert not required
   for_each            = local.regions
   name                = "gwa-linux-web-app-${each.key}-${var.env_name}"
   resource_group_name = azurerm_resource_group.gwa_web_rg[each.key].name
   location            = azurerm_service_plan.gwa_service_plan[each.key].location
   service_plan_id     = azurerm_service_plan.gwa_service_plan[each.key].id
+  https_only          = true
+  identity {
+    type = "SystemAssigned"
+  }
 
-  site_config {}
+  site_config {
+    ftps_state    = "FtpsOnly"
+    http2_enabled = true
+  }
+
+  auth_settings {
+    enabled = true
+  }
+
+  logs {
+    detailed_error_messages = true
+    failed_request_tracing  = true
+    http_logs {
+      file_system {
+        retention_in_days = 100
+        retention_in_mb   = 100
+      }
+    }
+  }
 
   tags = {
     tag = var.exampletag
