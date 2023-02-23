@@ -39,11 +39,10 @@ resource "azurerm_cdn_frontdoor_origin_group" "gwa_cdn_fd_origin_group" {
 }
 
 resource "azurerm_cdn_frontdoor_origin" "gwa_cdn_fd_origin" {
-  for_each                      = local.regions
-  name                          = "gwa-cdn-fd-origin-${each.key}-${var.env_name}"
-  cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.gwa_cdn_fd_origin_group.id
-  enabled                       = true
-
+  for_each                       = local.regions
+  name                           = "gwa-cdn-fd-origin-${each.key}-${var.env_name}"
+  cdn_frontdoor_origin_group_id  = azurerm_cdn_frontdoor_origin_group.gwa_cdn_fd_origin_group.id
+  enabled                        = true
   certificate_name_check_enabled = false
 
   host_name          = azurerm_linux_web_app.gwa_linux_web_app[each.key].default_hostname

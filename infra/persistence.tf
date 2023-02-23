@@ -61,7 +61,7 @@ resource "azurerm_mssql_server" "gwa_sql_server" {
 
 resource "azurerm_mssql_database" "gwa_sql_database" {
   name           = "gwa-sql-database-${var.env_name}"
-  server_id      = azurerm_mssql_server.gwa_sql_server["cc"].id
+  server_id      = azurerm_mssql_server.gwa_sql_server[element(keys(local.regions), 0)].id
   collation      = "SQL_Latin1_General_CP1_CI_AS"
   max_size_gb    = 5
   read_scale     = true
@@ -75,13 +75,13 @@ resource "azurerm_mssql_database" "gwa_sql_database" {
 
 resource "azurerm_mssql_failover_group" "gwa_sql_failover" {
   name      = "gwa-sql-failover-${var.env_name}"
-  server_id = azurerm_mssql_server.gwa_sql_server["cc"].id
+  server_id = azurerm_mssql_server.gwa_sql_server[element(keys(local.regions), 0)].id
   databases = [
     azurerm_mssql_database.gwa_sql_database.id
   ]
 
   partner_server {
-    id = azurerm_mssql_server.gwa_sql_server["eus2"].id
+    id = azurerm_mssql_server.gwa_sql_server[element(keys(local.regions), 1)].id
   }
 
   read_write_endpoint_failover_policy {

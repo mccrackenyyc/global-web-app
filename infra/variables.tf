@@ -9,11 +9,6 @@ variable "tenant_id" {
   type        = string
   default     = "b920523f-f894-4add-a94b-1b0e0eee84ab"
 }
-variable "appname" {
-  description = "Product name"
-  type        = string
-  default     = "gwa"
-}
 
 variable "location" {
   description = "Azure region"
