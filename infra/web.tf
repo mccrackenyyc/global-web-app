@@ -31,13 +31,16 @@ resource "azurerm_linux_web_app" "gwa_linux_web_app" {
   location            = azurerm_service_plan.gwa_service_plan[each.key].location
   service_plan_id     = azurerm_service_plan.gwa_service_plan[each.key].id
   https_only          = true
+
   identity {
     type = "SystemAssigned"
   }
 
   site_config {
-    ftps_state    = "FtpsOnly"
-    http2_enabled = true
+    ftps_state                        = "FtpsOnly"
+    http2_enabled                     = true
+    health_check_path                 = "/"
+    health_check_eviction_time_in_min = 4
   }
 
   auth_settings {
