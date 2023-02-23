@@ -1,7 +1,7 @@
 resource "azurerm_monitor_action_group" "gwa_monitor_group_main" {
   name                = "gwa-monitor-action-group-main-${var.env_name}"
-  resource_group_name = azurerm_resource_group.gwa_sql_rg.name
-  short_name          = "gwa-monitor-${var.env_name}"
+  resource_group_name = azurerm_resource_group.gwa_sql_rg[element(keys(local.regions), 0)].name
+  short_name          = "monitor-${var.env_name}"
 
   email_receiver {
     name          = "monitor-email"
@@ -11,10 +11,10 @@ resource "azurerm_monitor_action_group" "gwa_monitor_group_main" {
 
 resource "azurerm_monitor_metric_alert" "gwa_data_space_percentage_usage_on_sql_database" {
   name                = "gwa-data-space-percentage-usage-on-sql-database-${var.env_name}"
-  resource_group_name = azurerm_resource_group.gwa_sql_rg.name
+  resource_group_name = azurerm_resource_group.gwa_sql_rg[element(keys(local.regions), 0)].name
   scopes              = [azurerm_mssql_database.gwa_sql_database.id]
   severity            = 1
-  description         = "Action will be triggered when space utilization reaches 75%"
+  description         = "Action will be triggered when space utilization reaches 75%, only monitoring primary database since it's the write-heavy database"
 
   criteria {
     metric_namespace = "microsoft.sql/servers/databases"
