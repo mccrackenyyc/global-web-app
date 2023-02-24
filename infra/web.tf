@@ -25,6 +25,7 @@ resource "azurerm_service_plan" "gwa_service_plan" {
 resource "azurerm_linux_web_app" "gwa_linux_web_app" {
   #checkov:skip=CKV_AZURE_88:Website built using non-Azure storage
   #checkov:skip=CKV_AZURE_17:Client-side cert not required
+  #checkov:skip=CKV_AZURE_13:Website is public, no auth required
   for_each            = local.regions
   name                = "gwa-linux-web-app-${each.key}-${var.env_name}"
   resource_group_name = azurerm_resource_group.gwa_web_rg[each.key].name
@@ -44,7 +45,7 @@ resource "azurerm_linux_web_app" "gwa_linux_web_app" {
   }
 
   auth_settings {
-    enabled = true
+    enabled = false
   }
 
   logs {
