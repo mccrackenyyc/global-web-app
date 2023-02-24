@@ -14,7 +14,7 @@ resource "azurerm_service_plan" "gwa_service_plan" {
   resource_group_name = azurerm_resource_group.gwa_web_rg[each.key].name
   location            = azurerm_resource_group.gwa_web_rg[each.key].location
   os_type             = "Linux"
-  sku_name            = "EP1"
+  sku_name            = "P1v2"
   worker_count        = 2
 
   tags = {
